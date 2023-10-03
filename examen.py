@@ -16,13 +16,19 @@ with open(rutaArchivo, "r") as archivo:
     header = archivo.readline().strip()
     column_names = header.split(",")
 
+    print("columnas en el archivo:", column_names)
+
     # Obtén la lista de todos los IDs presentes en el archivo de texto
     ids_in_file = set()
-    
+
     for linea in archivo:
-        valores = linea.strip().split(",")
+        linea = linea.strip()  
+        if not linea:
+            continue
+        valores = linea.split(",")
         if len(valores) != len(column_names):
             print("Error: La cantidad de valores en la línea no coincide con las columnas.")
+            print("Valores en la línea:", valores) 
             continue
         
         id_value = valores[0]
@@ -55,11 +61,11 @@ with open(rutaArchivo, "r") as archivo:
             # Si existe, actualiza el registro en lugar de insertarlo nuevamente
             sql = f"""
             UPDATE unidadEconomica
-            SET tipo = %s, nombre = %s, razonSocial = %s, codigoActividadSCIAN = %s,
-                nombreActividad = %s, descripcionEstratosPersonalOcupado = %s
+            SET nombreUnidadEconomica = %s, razonSocial = %s, codigoActividadSCIAN = %s,
+                nombreActividad = %s, descripcionEstratoPersonalOcupado = %s
             WHERE id = %s
             """
-            cursor.execute(sql, (valores[1], valores[2], valores[3], valores[4], valores[5], valores[6], valores[0]))
+            cursor.execute(sql, (valores[1], valores[2], valores[3], valores[4], valores[5], valores[0]))
         else:
             # Si no existe, realiza la inserción
             sql = f"""
