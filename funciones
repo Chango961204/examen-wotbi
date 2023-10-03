@@ -1,0 +1,35 @@
+import mysql.connector
+
+# Conexión a la base de datos
+conn = mysql.connector.connect(
+    host="127.0.0.1",
+    user="root",
+    password="",
+    database="bdexamen"
+)
+
+cursor = conn.cursor()
+
+# Función para buscar una empresa por su nombre
+def buscar_empresa_por_nombre(nombre_empresa):
+    # Realiza una consulta SQL para buscar empresas por nombre
+    query = "SELECT * FROM unidadeconomica WHERE nombreUnidadEconomica LIKE %s"
+    nombre_empresa = f"%{nombre_empresa}%"  # Agrega comodines % para buscar coincidencias parciales
+    cursor.execute(query, (nombre_empresa,))
+    
+    # Obtiene todos los resultados de la consulta
+    resultados = cursor.fetchall()
+    
+    if resultados:
+        print("Empresas encontradas:")
+        for empresa in resultados:
+            print(f"ID: {empresa[0]}, Nombre: {empresa[1]}, Razon Social: {empresa[2]}, Actividad SCIAN: {empresa[3]}, Nombre Actividad: {empresa[4]}, Estrato Personal Ocupado: {empresa[5]}")
+    else:
+        print("No se encontraron empresas con ese nombre.")
+
+# Llama a la función con el nombre de la empresa que deseas buscar
+nombre_empresa_buscar = input("Ingrese el nombre de la empresa a buscar: ")
+buscar_empresa_por_nombre(nombre_empresa_buscar)
+
+# Cierra la conexión
+conn.close()
