@@ -27,9 +27,31 @@ def buscar_empresa_por_nombre(nombre_empresa):
     else:
         print("No se encontraron empresas con ese nombre.")
 
-# Llama a la función con el nombre de la empresa que deseas buscar
-nombre_empresa_buscar = input("Ingrese el nombre de la empresa a buscar: ")
-buscar_empresa_por_nombre(nombre_empresa_buscar)
+# Función para buscar empresas por número de empleados
+def buscar_empresas_por_numero_empleados(numero_empleados):
+    # Realiza una consulta SQL para buscar empresas por número de empleados
+    query = "SELECT * FROM unidadeconomica WHERE descripcionEstratoPersonalOcupado = %s"
+    cursor.execute(query, (numero_empleados,))
+    
+    # Obtiene todos los resultados de la consulta
+    resultados = cursor.fetchall()
+    
+    if resultados:
+        print(f"Empresas con {numero_empleados} empleados:")
+        for empresa in resultados:
+            print(f"ID: {empresa[0]}, Nombre: {empresa[1]}, Razon Social: {empresa[2]}, Actividad SCIAN: {empresa[3]}, Nombre Actividad: {empresa[4]}, Estrato Personal Ocupado: {empresa[5]}")
+    else:
+        print(f"No se encontraron empresas con {numero_empleados} empleados.")
+
+# Llama a las funciones según lo que desees buscar
+opcion = input("¿Qué desea buscar? (nombre/numero_empleados): ")
+
+if opcion == "nombre":
+    nombre_empresa_buscar = input("Ingrese el nombre de la empresa a buscar: ")
+    buscar_empresa_por_nombre(nombre_empresa_buscar)
+elif opcion == "numero_empleados":
+    numero_empleados_buscar = input("Ingrese el número de empleados a buscar: ")
+    buscar_empresas_por_numero_empleados(numero_empleados_buscar)
 
 # Cierra la conexión
 conn.close()
