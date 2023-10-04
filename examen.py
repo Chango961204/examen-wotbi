@@ -1,6 +1,5 @@
 import mysql.connector
 
-# Conexión a la base de datos
 conn = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
@@ -10,11 +9,9 @@ conn = mysql.connector.connect(
 
 cursor = conn.cursor()
 
-# Ruta de los archivos
 rutaArchivoUnidadEconomica = r"C:\Users\metal\OneDrive\Escritorio\wotbi\data.txt"
 rutaArchivoDireccion = r"C:\Users\metal\OneDrive\Escritorio\wotbi\direccion.txt"
 
-# Función para procesar un archivo y actualizar la base de datos
 def procesar_archivo(archivo, tabla):
     ids_to_delete = set()  # Inicializa la variable ids_to_delete como un conjunto vacío
     with open(archivo, "r") as archivo:
@@ -48,7 +45,7 @@ def procesar_archivo(archivo, tabla):
                 ids_to_delete_str = ', '.join(ids_to_delete)
                 cursor.execute(f"DELETE FROM direccion WHERE unidadEconomicaId IN ({ids_to_delete_str})")
 
-        # Elimina registros de la base de datos que no están presentes en el archivo
+        
         if ids_to_delete:
             ids_to_delete_str = ', '.join(ids_to_delete)
             cursor.execute(f"DELETE FROM {tabla} WHERE id IN ({ids_to_delete_str})")
@@ -61,12 +58,11 @@ def procesar_archivo(archivo, tabla):
                 print(f"Error: La cantidad de valores en la línea no coincide con las columnas en {tabla}.")
                 continue
 
-            # Verifica si ya existe un registro con el mismo valor de 'id' en la base de datos
             cursor.execute(f"SELECT id FROM {tabla} WHERE id = %s", (valores[0],))
             existing_record = cursor.fetchone()
 
             if existing_record:
-                # Si existe, actualiza el registro en lugar de insertarlo nuevamente
+                
                 sql = f"""
                 UPDATE {tabla}
                 SET {" = %s, ".join(column_names[1:])} = %s
@@ -74,19 +70,17 @@ def procesar_archivo(archivo, tabla):
                 """
                 cursor.execute(sql, (valores[1:] + [valores[0]]))
             else:
-                # Si no existe, realiza la inserción
+                # Si no existe,realiza la inserción
                 sql = f"""
                 INSERT INTO {tabla} ({", ".join(column_names)})
                 VALUES ({", ".join(['%s'] * len(column_names))})
                 """
                 cursor.execute(sql, valores)
 
-        # Confirma los cambios
         conn.commit()
 
-# Procesar archivo unidadEconomica.txt y direccion.txt
+
 procesar_archivo(rutaArchivoUnidadEconomica, "unidadEconomica")
 procesar_archivo(rutaArchivoDireccion, "direccion")
 
-# Cierra la conexión
 conn.close()
